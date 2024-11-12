@@ -2,30 +2,43 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useState } from "react";
+import { useState, KeyboardEvent, ChangeEvent } from "react";
 
 export default function Home() {
-  const [iframeWidth, setIframeWidth] = useState("1000");
-  const [iframeHeight, setIframeHeight] = useState("600");
+  const INITIAL_WIDTH = "1000";
+  const INITIAL_HEIGHT = "600";
+  const DEV_URL = "https://neurons.widget.dev2.webant.ru/";
+  const PROD_URL = "https://neurons.widget.cgamult.ru";
 
-  const [inputValueWidth, setInputValueWidth] = useState("1000");
-  const [inputValueHeight, setInputValueHeight] = useState("600");
+  const [iframeUrl, setIframeUrl] = useState(DEV_URL);
+  const [iframeWidth, setIframeWidth] = useState(INITIAL_WIDTH);
+  const [iframeHeight, setIframeHeight] = useState(INITIAL_HEIGHT);
+  const [inputValueWidth, setInputValueWidth] = useState(INITIAL_WIDTH);
+  const [inputValueHeight, setInputValueHeight] = useState(INITIAL_HEIGHT);
 
   const handleApply = () => {
     setIframeWidth(inputValueWidth);
     setIframeHeight(inputValueHeight);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleApply();
     }
+  };
+
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    setter: (value: string) => void
+  ) => {
+    setter(e.target.value);
   };
 
   return (
@@ -42,7 +55,7 @@ export default function Home() {
             <Input
               id="width-input"
               value={inputValueWidth}
-              onChange={(e) => setInputValueWidth(e.target.value)}
+              onChange={(e) => handleInputChange(e, setInputValueWidth)}
               onKeyPress={handleKeyPress}
               title="Width"
               placeholder="Width"
@@ -50,13 +63,13 @@ export default function Home() {
             />
           </div>
           <div>
-            <label htmlFor="heitgh-input" className="">
+            <label htmlFor="height-input" className="">
               Высота
             </label>
             <Input
               id="height-input"
               value={inputValueHeight}
-              onChange={(e) => setInputValueHeight(e.target.value)}
+              onChange={(e) => handleInputChange(e, setInputValueHeight)}
               onKeyPress={handleKeyPress}
               title="Height"
               placeholder="Height"
@@ -71,18 +84,34 @@ export default function Home() {
               <TooltipContent>
                 <p>Нажмите, чтобы применить новые размеры виджета</p>
               </TooltipContent>
-            </Tooltip>{" "}
+            </Tooltip>
           </TooltipProvider>
+
+          <Separator orientation="vertical" className="h-10" />
+
+          <Button
+            onClick={() => setIframeUrl(DEV_URL)}
+            variant={iframeUrl === DEV_URL ? "default" : "outline"}
+          >
+            dev
+          </Button>
+          <Button
+            onClick={() => setIframeUrl(PROD_URL)}
+            variant={iframeUrl === PROD_URL ? "default" : "outline"}
+          >
+            prod
+          </Button>
         </div>
         <div className="flex justify-center items-center border-2 m-0">
           <iframe
-            src="https://neurons.widget.dev2.webant.ru/"
+            src={iframeUrl}
             width={iframeWidth}
             height={iframeHeight}
             style={{
               transition: "all 0.3s ease-in-out",
             }}
-          ></iframe>
+            title="Neurons Widget"
+          />
         </div>
       </main>
     </div>
