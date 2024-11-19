@@ -13,6 +13,9 @@ import { useState, KeyboardEvent, ChangeEvent, useEffect, useCallback } from "re
 
 export default function Home() {
   const calculateInitialWidth = () => {
+    if (typeof window === 'undefined') {
+      return 1000;
+    }
     const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
     return isMobile ? window.innerWidth - 40 : window.innerWidth < 1030 ? window.innerWidth - 40 : 1000;
   };
@@ -22,9 +25,9 @@ export default function Home() {
   const INITIAL_HEIGHT = "600";
 
   const [iframeUrl, setIframeUrl] = useState(DEV_URL);
-  const [iframeWidth, setIframeWidth] = useState(calculateInitialWidth);
+  const [iframeWidth, setIframeWidth] = useState(1000);
   const [iframeHeight, setIframeHeight] = useState(INITIAL_HEIGHT);
-  const [inputValueWidth, setInputValueWidth] = useState(calculateInitialWidth);
+  const [inputValueWidth, setInputValueWidth] = useState(1000);
   const [inputValueHeight, setInputValueHeight] = useState(INITIAL_HEIGHT);
 
   const handleApply = () => {
