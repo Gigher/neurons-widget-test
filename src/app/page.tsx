@@ -22,7 +22,7 @@ export default function Home() {
 
   const DEV_URL = "https://neurons.widget.dev2.webant.ru/";
   const PROD_URL = "https://neurons.widget.cgamult.ru";
-  const INITIAL_HEIGHT = "600";
+  const INITIAL_HEIGHT = "770";
 
   const [iframeUrl, setIframeUrl] = useState(DEV_URL);
   const [iframeWidth, setIframeWidth] = useState(1000);
@@ -50,8 +50,10 @@ export default function Home() {
 
   const handleResize = useCallback(() => {
     const newWidth = calculateInitialWidth();
+  if (iframeWidth > newWidth) {
     setIframeWidth(newWidth);
     setInputValueWidth(newWidth);
+  }
   }, []);
 
   useEffect(() => {
