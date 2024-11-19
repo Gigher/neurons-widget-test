@@ -20,9 +20,9 @@ export default function Home() {
     return isMobile ? window.innerWidth - 40 : window.innerWidth < 1030 ? window.innerWidth - 40 : 1000;
   };
 
-  const DEV_URL = "https://neurons.widget.dev2.webant.ru/";
+  const DEV_URL = "http://192.168.11.77:3000";
   const PROD_URL = "https://neurons.widget.cgamult.ru";
-  const INITIAL_HEIGHT = "770";
+  const INITIAL_HEIGHT = "850";
 
   const [iframeUrl, setIframeUrl] = useState(DEV_URL);
   const [iframeWidth, setIframeWidth] = useState(1000);
