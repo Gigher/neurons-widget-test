@@ -9,18 +9,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useState, KeyboardEvent, ChangeEvent } from "react";
+import { useState, KeyboardEvent, ChangeEvent, useEffect, useCallback } from "react";
 
 export default function Home() {
-  const INITIAL_WIDTH = "1000";
-  const INITIAL_HEIGHT = "600";
+  const calculateInitialWidth = () => {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    return isMobile ? window.innerWidth - 40 : window.innerWidth < 1030 ? window.innerWidth - 40 : 1000;
+  };
+
   const DEV_URL = "https://neurons.widget.dev2.webant.ru/";
   const PROD_URL = "https://neurons.widget.cgamult.ru";
+  const INITIAL_HEIGHT = "600";
 
   const [iframeUrl, setIframeUrl] = useState(DEV_URL);
-  const [iframeWidth, setIframeWidth] = useState(INITIAL_WIDTH);
+  const [iframeWidth, setIframeWidth] = useState(calculateInitialWidth);
   const [iframeHeight, setIframeHeight] = useState(INITIAL_HEIGHT);
-  const [inputValueWidth, setInputValueWidth] = useState(INITIAL_WIDTH);
+  const [inputValueWidth, setInputValueWidth] = useState(calculateInitialWidth);
   const [inputValueHeight, setInputValueHeight] = useState(INITIAL_HEIGHT);
 
   const handleApply = () => {
@@ -36,14 +40,48 @@ export default function Home() {
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
-    setter: (value: string) => void
+    setter: (value: string | number) => void
   ) => {
     setter(e.target.value);
   };
 
+  const handleResize = useCallback(() => {
+    const newWidth = calculateInitialWidth();
+    setIframeWidth(newWidth);
+    setInputValueWidth(newWidth);
+  }, []);
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      handleResize();
+    });
+
+    resizeObserver.observe(document.documentElement);
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+
+    if (window.screen?.orientation) {
+      window.screen.orientation.addEventListener('change', handleResize);
+    }
+
+    const mediaQuery = window.matchMedia('(orientation: portrait)');
+    mediaQuery.addEventListener('change', handleResize);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+      if (window.screen?.orientation) {
+        window.screen.orientation.removeEventListener('change', handleResize);
+      }
+      mediaQuery.removeEventListener('change', handleResize);
+    };
+  }, [handleResize]);
+
   return (
-    <div className="py-20 flex flex-col justify-between items-center min-h-screen">
-      <main className="flex flex-col gap-8 row-start-2 items-center justify-center sm:items-start">
+    <div className="py-20 flex flex-col justify-between items-center min-h-screen px-5">
+      <main className="flex flex-col gap-8 row-start-2 items-center justify-center overflow-x-scroll sm:items-start">
         <h1 className="w-full text-center text-5xl font-normal">
           Neurons widget test
         </h1>
@@ -55,7 +93,7 @@ export default function Home() {
             <Input
               id="width-input"
               value={inputValueWidth}
-              onChange={(e) => handleInputChange(e, setInputValueWidth)}
+              onChange={(e) => handleInputChange(e, (value) => setInputValueWidth(Number(value)))}
               onKeyPress={handleKeyPress}
               title="Width"
               placeholder="Width"
@@ -78,7 +116,7 @@ export default function Home() {
           </div>
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <Button onClick={handleApply}>Применить</Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -109,6 +147,7 @@ export default function Home() {
             height={iframeHeight}
             style={{
               transition: "all 0.3s ease-in-out",
+              maxWidth: '100%'
             }}
             title="Neurons Widget"
           />
