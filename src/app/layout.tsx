@@ -16,6 +16,10 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "Neurons widget test",
   description: "Testing neurons widget capability",
+  robots: {
+    index: false,
+    follow: false
+  }
 };
 
 export default function RootLayout({
